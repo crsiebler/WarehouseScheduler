@@ -1,0 +1,5 @@
+1. Work hours: 08:00 ~ 14:00
+2. Work days: Monday through Saturday
+3. Loading Time: 3.5 Hours
+4. Truck departure time: 2018-08-14 10:00
+5. Loading time can be spread across different days
