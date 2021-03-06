@@ -9,15 +9,13 @@ def usage():
     """Help documentation"""
     print(
         f"\nusage: routes_finder [-v] [-h] [--verbose] [--help] "
-        f"[--input=<Input-File>] [--output=<Output-File>] "
+        f"[--input=<Input-File>]"
         f"\nOptions:\n"
         f"\t-v, --verbose\t\tVerbose\n"
         f"\t-h, --help\t\tHelp\n"
         f"\t--input\t\t\tFilename\n"
-        f"\t--output\t\tFilename\n"
         f"\nArguments:\n"
         f"\tInput-File: Text file containing the origin & destination input (Default: tests/input/input1.txt).\n"
-        f"\tOutput-File: Filename and path where to output the results (Default: tests/output/output1.txt).\n"
     )
 
 
@@ -33,10 +31,6 @@ def main():
                 "help",
                 "verbose",
                 "input=",
-                "output=",
-                "locations=",
-                "trips=",
-                "results=",
             ],
         )
     except getopt.GetoptError as err:
@@ -46,7 +40,6 @@ def main():
 
     # Define input arguments and initialize default values.
     input_file = "tests/input/input1.txt"
-    output_file = "tests/output/output1.txt"
 
     # Loop through all the User CLI options/arguments
     for opt, arg in opts:
@@ -61,13 +54,8 @@ def main():
 
             if not os.path.exists(input_file):
                 sys.exit("Could not find input file")
-        elif opt == "--output":
-            output_file = arg
 
-    parse(
-        input_file,
-        output_file,
-    )
+    print(parse(input_file))
 
 
 if __name__ == "__main__":
