@@ -128,8 +128,10 @@ class TestScheduler(unittest.TestCase):
             "Failed to parse loading perference for cannot be spread",
         )
 
+    @unittest.SkipTest
     def test_scheduler(self):
-        
+        pass
+
     @unittest.SkipTest
     def test_input1(self):
         self.assertEqual(parse(self.input1), "2018-08-11 11:00")
