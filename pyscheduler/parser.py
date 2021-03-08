@@ -9,7 +9,7 @@ Shift = Tuple[dt.time, dt.time]
 
 
 def parse_work_hours(raw: str) -> Shift:
-    """"""
+    """Create a tuple consisting of two datetimes cooresponding to start/end."""
     SEPARATOR = "~"
 
     def parse_hour(raw: str):
@@ -20,7 +20,17 @@ def parse_work_hours(raw: str) -> Shift:
 
 
 def parse_work_days(raw: str) -> Layout:
-    """"""
+    """Generate a list containing '1' for each working day.
+
+    The list starts on Monday so index 1 would be Tuesday and so forth. A value
+    of 1 represents an on duty day, while a value of 0 represents an off day.
+    This function provides support for both CSV days, and a range of days.
+
+    Example input -> output:
+        Monday, Tuesday, Wednesday -> [1, 1, 1, 0, 0, 0, 0]
+        Monday through Friday -> [1, 1, 1, 1, 1, 0, 0]
+        Tuesday, Friday through Sunday -> [0, 1, 0, 0, 1, 1, 1]
+    """
     SEPARATOR = ","
     RANGE = "through"
     layout = [0] * 7
@@ -59,17 +69,20 @@ def parse_work_days(raw: str) -> Layout:
 
 
 def parse_loading_time(raw: str):
-    """"""
+    """Create a timedelta object from the loading time string."""
     return pd.to_timedelta(raw.strip())
 
 
 def parse_departure_time(raw: str):
-    """"""
+    """Create a datetime object from the departure time string.
+
+    Format for the datetime string is '%Y-%m-%d %H:%M'.
+    """
     return pd.to_datetime(raw.split("(")[0].strip(), format="%Y-%m-%d %H:%M")
 
 
 def parse_loading_perference(raw: str):
-    """"""
+    """Determine if the loading preference is SAME_DAY or SPREAD."""
     KEYWORD_SAME_DAY = "same day"
     KEYWORD_CANNOT = "cannot"
     return (
@@ -80,12 +93,12 @@ def parse_loading_perference(raw: str):
 
 
 def parse_line(line: str) -> str:
-    """"""
-    return ":".join(line.split(":")[1:])
+    """Break up the line based on the semi-colon w/ space & grab right split"""
+    return line.split(": ")[1].strip()
 
 
-def parse_schedule(input: TextIO):
-    """"""
+def parse_schedule(input: TextIO) -> dict:
+    """Parse the schedule and return a dict containing each key of Scheduler."""
     raw_work_hours = parse_line(input.readline())
     raw_work_days = parse_line(input.readline())
     raw_loading_time = parse_line(input.readline())
@@ -102,15 +115,15 @@ def parse_schedule(input: TextIO):
 
 
 def parse(input_file: str) -> None:
-    """"""
-    # Read the input file to determine the warehouse schedule
+    """Read the input text file containing the schedule & return the result."""
     with open(input_file, "r") as input:
         result = "Unknown"
         try:
+            # Read the input file to determine the warehouse schedule
             scheduler = Scheduler(**parse_schedule(input))
-            result = scheduler.deadline()
-            print(f"{result.round('T')}")
-        except InvalidScheduleException as ise:
-            logging.error(ise)
+            result = scheduler.deadline().round("T").strftime("%Y-%m-%d %H:%M")
+        except InvalidScheduleException as e:
+            logging.error(e)
+            raise
 
         return result

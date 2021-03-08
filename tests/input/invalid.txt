@@ -1,0 +1,5 @@
+1. Work hours: 08:00 ~ 09:00
+2. Work days: Monday through Saturday
+3. Loading Time: 3 Hours
+4. Truck departure time: 2018-08-13 10:00 (CarvanaLand local timezone)
+5. Loading time has to be on the same day
