@@ -1,4 +1,5 @@
-FROM python:3.9.2-alpine
+# Using this docker image with pre-compiled pandas
+FROM amancevice/pandas:1.2.3
 
 WORKDIR /usr/src/app
 

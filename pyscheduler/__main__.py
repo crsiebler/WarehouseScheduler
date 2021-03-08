@@ -1,4 +1,5 @@
 import os
+from pyscheduler.scheduler import InvalidScheduleException
 import sys
 import getopt
 import logging
@@ -15,7 +16,7 @@ def usage():
         f"\t-h, --help\t\tHelp\n"
         f"\t--input\t\t\tFilename\n"
         f"\nArguments:\n"
-        f"\tInput-File: Text file containing the origin & destination input (Default: tests/input/input1.txt).\n"
+        f"\tInput-File: Text file containing the origin & destination input (Default: tests/input/sameday.txt).\n"
     )
 
 
@@ -34,12 +35,12 @@ def main():
             ],
         )
     except getopt.GetoptError as err:
-        print(str(err))
+        logging.error(str(err))
         usage()
         sys.exit(2)
 
     # Define input arguments and initialize default values.
-    input_file = "tests/input/input1.txt"
+    input_file = "tests/input/sameday.txt"
 
     # Loop through all the User CLI options/arguments
     for opt, arg in opts:
@@ -55,7 +56,11 @@ def main():
             if not os.path.exists(input_file):
                 sys.exit("Could not find input file")
 
-    print(parse(input_file))
+    try:
+        print(parse(input_file))
+    except InvalidScheduleException:
+        # Invalid schedule given
+        sys.exit(2)
 
 
 if __name__ == "__main__":

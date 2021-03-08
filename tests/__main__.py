@@ -2,7 +2,7 @@ import unittest
 import logging
 import pandas as pd
 import datetime as dt
-from pyscheduler.scheduler import Scheduler
+from pyscheduler.scheduler import InvalidScheduleException, Scheduler
 from pyscheduler.parser import (
     parse,
     parse_work_hours,
@@ -14,24 +14,25 @@ from pyscheduler.parser import (
 )
 
 logging.basicConfig()
-logging.getLogger().setLevel(logging.ERROR)
+logging.getLogger().setLevel(logging.CRITICAL)
 
 
 class TestScheduler(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestScheduler, self).__init__(*args, **kwargs)
+        self.invalid = "tests/input/invalid.txt"
+        self.sameday = "tests/input/sameday.txt"
+        self.spread = "tests/input/spread.txt"
         self.input1 = "tests/input/input1.txt"
         self.input2 = "tests/input/input2.txt"
         self.input3 = "tests/input/input3.txt"
         self.input4 = "tests/input/input4.txt"
         self.input5 = "tests/input/input5.txt"
-        self.input6 = "tests/input/input6.txt"
-        self.input7 = "tests/input/input7.txt"
 
     def test_parse_line(self):
-        self.assertEqual(parse_line("A:B"), "B", "Invalid split")
+        self.assertEqual(parse_line("A: B"), "B", "Invalid split")
         self.assertEqual(parse_line(" A : B "), "B", "String stripping failed")
-        self.assertEqual(parse_line("A:B:C"), "B", "Wrong index on split")
+        self.assertEqual(parse_line("A: B: C"), "B", "Wrong index on split")
 
     def test_parse_work_hours(self):
         self.assertTupleEqual(
@@ -69,13 +70,13 @@ class TestScheduler(unittest.TestCase):
             "Failed to parse day range",
         )
         self.assertListEqual(
-            parse_work_days("Tuesday, Friday through Sunday"),
-            [0, 1, 0, 0, 1, 1, 1],
+            parse_work_days("Tuesday, Friday through Saturday"),
+            [0, 1, 0, 0, 1, 1, 0],
             "Failed to parse compond range",
         )
         self.assertListEqual(
-            parse_work_days("Sunday through Tuesday"),
-            [1, 1, 0, 0, 0, 0, 1],
+            parse_work_days("Friday through Tuesday"),
+            [1, 1, 0, 0, 1, 1, 1],
             "Failed to parse range with overlapping start of the week",
         )
 
@@ -128,37 +129,30 @@ class TestScheduler(unittest.TestCase):
             "Failed to parse loading perference for cannot be spread",
         )
 
-    @unittest.SkipTest
-    def test_scheduler(self):
-        pass
+    def test_sameday(self):
+        self.assertEqual(parse(self.sameday), "2018-08-11 11:00")
 
-    @unittest.SkipTest
+    def test_spread(self):
+        self.assertEqual(parse(self.spread), "2018-08-13 13:00")
+
+    def test_invalid_schedule(self):
+        with self.assertRaises(InvalidScheduleException) as _:
+            parse(self.invalid)
+
     def test_input1(self):
-        self.assertEqual(parse(self.input1), "2018-08-11 11:00")
+        self.assertEqual(parse(self.input1), "2018-08-15 11:00")
 
-    @unittest.SkipTest
     def test_input2(self):
-        self.assertEqual(parse(self.input2), "2018-08-13 13:00")
+        self.assertEqual(parse(self.input2), "2018-08-15 11:00")
 
-    @unittest.SkipTest
     def test_input3(self):
-        self.assertEqual(parse(self.input3), "2018-08-13 13:00")
+        self.assertEqual(parse(self.input3), "2018-08-13 15:00")
 
-    @unittest.SkipTest
     def test_input4(self):
-        self.assertEqual(parse(self.input4), "2018-08-13 13:00")
+        self.assertEqual(parse(self.input4), "2018-08-13 12:30")
 
-    @unittest.SkipTest
     def test_input5(self):
-        self.assertEqual(parse(self.input5), "2018-08-13 13:00")
-
-    @unittest.SkipTest
-    def test_input6(self):
-        self.assertEqual(parse(self.input6), "2018-08-13 13:00")
-
-    @unittest.SkipTest
-    def test_input7(self):
-        self.assertEqual(parse(self.input7), "2018-08-13 13:00")
+        self.assertEqual(parse(self.input5), "2018-08-13 10:30")
 
 
 if __name__ == "__main__":
