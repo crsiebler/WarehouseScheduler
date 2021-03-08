@@ -1,10 +1,11 @@
 import logging
 import pandas as pd
+import datetime as dt
 from typing import Tuple, TextIO, List
-from .scheduler import Weekday, Scheduler
+from .scheduler import InvalidScheduleException, Weekday, Scheduler
 
 Layout = List[int]
-Shift = Tuple[str, str]
+Shift = Tuple[dt.time, dt.time]
 
 
 def parse_work_hours(raw: str) -> Shift:
@@ -104,5 +105,12 @@ def parse(input_file: str) -> None:
     """"""
     # Read the input file to determine the warehouse schedule
     with open(input_file, "r") as input:
-        scheduler = Scheduler(**parse_schedule(input))
-        return scheduler.timeboard
+        result = "Unknown"
+        try:
+            scheduler = Scheduler(**parse_schedule(input))
+            result = scheduler.deadline()
+            print(f"{result.round('T')}")
+        except InvalidScheduleException as ise:
+            logging.error(ise)
+
+        return result
