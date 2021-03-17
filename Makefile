@@ -14,3 +14,13 @@ run:
 
 test:
 	docker run -it --rm --name pyscheduler -v ${PWD}:/usr/src/app -w /usr/src/app pyscheduler python -m tests
+
+coverage:
+	docker run -it --rm --name pyscheduler -v ${PWD}:/usr/src/app -w /usr/src/app pyscheduler coverage run -m tests	
+
+coverage-report:
+	docker run -it --rm --name pyscheduler -v ${PWD}:/usr/src/app -w /usr/src/app pyscheduler coverage report
+
+coverage-html:
+	docker run -it --rm --name pyscheduler -v ${PWD}:/usr/src/app -w /usr/src/app pyscheduler coverage html
+	wslview htmlcov/index.html
